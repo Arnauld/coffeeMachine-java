@@ -1,22 +1,38 @@
 package coffeemachine;
 
+import java.math.BigDecimal;
+
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
-public class Drink {
-    private final DrinkType type;
-    private final int numberOfSugar;
+public enum Drink {
+    Tea("tea", "T", "0.4"),
+    Coffee("coffee", "C", "0.5"),
+    Chocolate("chocolate", "H", "0.6");
 
-    public Drink(DrinkType type, int numberOfSugar) {
-        this.type = type;
-        this.numberOfSugar = numberOfSugar;
+    private final String asString;
+    private final String protocol;
+    private final BigDecimal price;
+
+    Drink(String asString, String protocol, String price) {
+        this.asString = asString;
+        this.protocol = protocol;
+        this.price = new BigDecimal(price);
     }
 
-    public DrinkType getType() {
-        return type;
+    public String protocolPart() {
+        return protocol;
     }
 
-    public int getNumberOfSugar() {
-        return numberOfSugar;
+    public static Drink fromString(String typeOfDrink) {
+        for(Drink type : values()) {
+            if(type.asString.equalsIgnoreCase(typeOfDrink))
+                return type;
+        }
+        throw new IllegalArgumentException("Unknown type of drink '" + typeOfDrink + "'");
+    }
+
+    public BigDecimal price() {
+        return price;
     }
 }
