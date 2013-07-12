@@ -8,7 +8,18 @@ import java.math.BigDecimal;
 public enum Drink {
     Tea("tea", "T", "0.4"),
     Coffee("coffee", "C", "0.5"),
-    Chocolate("chocolate", "H", "0.6");
+    Chocolate("chocolate", "H", "0.6"),
+    OrangeJuice("Orange Juice", "O", "0.6") {
+        @Override
+        public boolean effectiveExtraHot(boolean extraHot) {
+            return false;
+        }
+
+        @Override
+        public int effectiveNumberOfSugar(int numberOfSugar) {
+            return 0;
+        }
+    };
 
     private final String asString;
     private final String protocol;
@@ -35,4 +46,13 @@ public enum Drink {
     public BigDecimal price() {
         return price;
     }
+
+    public int effectiveNumberOfSugar(int numberOfSugar) {
+        return numberOfSugar;
+    }
+
+    public boolean effectiveExtraHot(boolean extraHot) {
+        return extraHot;
+    }
+
 }

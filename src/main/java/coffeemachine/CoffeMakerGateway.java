@@ -44,6 +44,6 @@ public class CoffeMakerGateway {
 
     private String typeOfDrinkProtocolPart(Order order) {
         Drink drink = order.getDrink();
-        return drink.protocolPart();
+        return drink.protocolPart() + (order.isExtraHot()?"h":"");
     }
 }

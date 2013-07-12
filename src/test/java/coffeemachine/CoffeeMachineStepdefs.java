@@ -17,10 +17,30 @@ public class CoffeeMachineStepdefs {
     private String message;
     private BigDecimal money = new BigDecimal("2");
 
-    @When("^I order a \"([^\"]*)\" with (\\d+) sugar$")
+    @When("^I order an? \"([^\"]*)\"$")
+    public void I_order_an(String typeOfDrink) throws Throwable {
+        orderDrink(typeOfDrink, 0, false);
+    }
+
+    @When("^I order an? \"([^\"]*)\" with (\\d+) sugar$")
     public void I_order_a_with_sugar(String typeOfDrink, int numberOfSugar) throws Throwable {
+        orderDrink(typeOfDrink, numberOfSugar, false);
+    }
+
+    @When("^I order an extra hot \"([^\"]*)\" with (\\d+) sugar$")
+    public void I_order_an_extra_hot_with_sugar(String typeOfDrink, int numberOfSugar) throws Throwable {
+        orderDrink(typeOfDrink, numberOfSugar, true);
+    }
+
+//    @When("^I order a(n extra hot)? \"([^\"]*)\" with (\\d+) sugar$")
+//    public void I_order_an_extra_hot_with_sugar(String extraHot, String typeOfDrink, int numberOfSugar) throws Throwable {
+//        boolean isExtraHot = areEquals(extraHot, "n extra hot");
+//        orderDrink(typeOfDrink, numberOfSugar, isExtraHot);
+//    }
+
+    private void orderDrink(String typeOfDrink, int numberOfSugar, boolean extraHot) {
         Drink type = Drink.fromString(typeOfDrink);
-        Order order = new Order(type, numberOfSugar, money);
+        Order order = new Order(type, numberOfSugar, money, extraHot);
         this.message = gateway.order(order);
     }
 
@@ -39,4 +59,10 @@ public class CoffeeMachineStepdefs {
         this.money = money;
     }
 
+    private static boolean areEquals(String one, String two) {
+        if(one==null)
+            return two==null;
+        else
+            return two != null && one.equals(two);
+    }
 }

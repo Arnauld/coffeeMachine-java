@@ -9,11 +9,17 @@ public class Order {
     private final Drink drink;
     private final int numberOfSugar;
     private final BigDecimal money;
+    private final boolean extraHot;
 
-    public Order(Drink drink, int numberOfSugar, BigDecimal money) {
+    public Order(Drink drink, int numberOfSugar, BigDecimal money, boolean extraHot) {
         this.drink = drink;
         this.numberOfSugar = numberOfSugar;
         this.money = money;
+        this.extraHot = extraHot;
+    }
+
+    public boolean isExtraHot() {
+        return drink.effectiveExtraHot(extraHot);
     }
 
     public Drink getDrink() {
@@ -21,7 +27,7 @@ public class Order {
     }
 
     public int getNumberOfSugar() {
-        return numberOfSugar;
+        return drink.effectiveNumberOfSugar(numberOfSugar);
     }
 
     public BigDecimal getMoney() {
