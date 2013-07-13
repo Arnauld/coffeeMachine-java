@@ -8,7 +8,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import cucumber.api.DataTable;
-import cucumber.api.Format;
 import cucumber.api.Scenario;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
@@ -18,10 +17,8 @@ import cucumber.api.java.en.When;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 /**
