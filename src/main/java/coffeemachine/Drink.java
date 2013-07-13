@@ -1,6 +1,10 @@
 package coffeemachine;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
@@ -9,7 +13,7 @@ public enum Drink {
     Tea("tea", "T", "0.4"),
     Coffee("coffee", "C", "0.5"),
     Chocolate("chocolate", "H", "0.6"),
-    OrangeJuice("Orange Juice", "O", "0.6") {
+    OrangeJuice("orange juice", "O", "0.6") {
         @Override
         public boolean effectiveExtraHot(boolean extraHot) {
             return false;
@@ -29,6 +33,10 @@ public enum Drink {
         this.asString = asString;
         this.protocol = protocol;
         this.price = new BigDecimal(price);
+    }
+
+    public String getAsString() {
+        return asString;
     }
 
     public String protocolPart() {
@@ -55,4 +63,14 @@ public enum Drink {
         return extraHot;
     }
 
+    public static List<Drink> allInAphbeticalOrder() {
+        List<Drink> drinks = Arrays.asList(values());
+        Collections.sort(drinks, new Comparator<Drink>() {
+            @Override
+            public int compare(Drink o1, Drink o2) {
+                return o1.asString.compareTo(o2.asString);
+            }
+        });
+        return drinks;
+    }
 }

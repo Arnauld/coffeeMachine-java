@@ -2,18 +2,37 @@ package coffeemachine;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
 public class CoffeMakerGateway {
+
+    private Map<Drink,Integer> stats = new HashMap<Drink, Integer>();
+    private BigDecimal total = BigDecimal.ZERO;
+
     public String order(Order order) {
         BigDecimal missingMoney = missingMoney(order);
         if(missingMoney.compareTo(BigDecimal.ZERO) > 0)
             return message("Not enough money " + formatMoney(missingMoney) + " missing");
-        else
+        else {
+            updateStats(order);
             return typeOfDrinkProtocolPart(order) + ":" + sugarProtocolPart(order);
+        }
+    }
+
+    private void updateStats(Order order) {
+        Drink drink = order.getDrink();
+
+        Integer count = stats.get(drink);
+        if(count==null) {
+            count = 0;
+        }
+        stats.put(drink, count + 1);
+        total = total.add(drink.price());
     }
 
     private String formatMoney(BigDecimal money) {
@@ -45,5 +64,19 @@ public class CoffeMakerGateway {
     private String typeOfDrinkProtocolPart(Order order) {
         Drink drink = order.getDrink();
         return drink.protocolPart() + (order.isExtraHot()?"h":"");
+    }
+
+    public String statisticsSnapshot() {
+        StringBuilder builder = new StringBuilder();
+        for(Drink drink : Drink.allInAphbeticalOrder()) {
+            Integer count = stats.get(drink);
+            if(count != null) {
+                builder.append(drink.getAsString().toLowerCase()) //
+                       .append(": ").append(count).append("\n");
+            }
+        }
+        builder.append("---\n");
+        builder.append("Total: ").append(formatMoney(total)).append("€");
+        return builder.toString();
     }
 }

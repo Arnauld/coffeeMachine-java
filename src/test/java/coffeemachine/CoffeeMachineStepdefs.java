@@ -2,11 +2,18 @@ package coffeemachine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import cucumber.api.DataTable;
+import cucumber.api.Format;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
@@ -16,6 +23,7 @@ public class CoffeeMachineStepdefs {
     private CoffeMakerGateway gateway = new CoffeMakerGateway();
     private String message;
     private BigDecimal money = new BigDecimal("2");
+    private String statisticsSnapshot;
 
     @When("^I order an? \"([^\"]*)\"$")
     public void I_order_an(String typeOfDrink) throws Throwable {
@@ -39,8 +47,11 @@ public class CoffeeMachineStepdefs {
 //    }
 
     private void orderDrink(String typeOfDrink, int numberOfSugar, boolean extraHot) {
-        Drink type = Drink.fromString(typeOfDrink);
-        Order order = new Order(type, numberOfSugar, money, extraHot);
+        orderDrink(Drink.fromString(typeOfDrink), numberOfSugar, extraHot, money, new Date());
+    }
+
+    private void orderDrink(Drink drink, int numberOfSugar, boolean extraHot, BigDecimal money, Date when) {
+        Order order = new Order(drink, numberOfSugar, money, extraHot, when);
         this.message = gateway.order(order);
     }
 
@@ -59,10 +70,23 @@ public class CoffeeMachineStepdefs {
         this.money = money;
     }
 
-    private static boolean areEquals(String one, String two) {
-        if(one==null)
-            return two==null;
-        else
-            return two != null && one.equals(two);
+    @Given("^the following orders:$")
+    public void the_following_orders(DataTable orders) throws Throwable {
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+        for(Map<String,String> row : orders.asMaps()) {
+            Date when = df.parse(row.get("time"));
+            Drink drink = Drink.fromString(row.get("drink"));
+            orderDrink(drink, 0, false, drink.price(), when);
+        }
+    }
+
+    @When("^I query for a report$")
+    public void I_query_for_a_report() throws Throwable {
+        statisticsSnapshot = gateway.statisticsSnapshot();
+    }
+
+    @Then("^the report output should be$")
+    public void the_report_ouput_should_be(String expectedStatistics) throws Throwable {
+        assertThat(statisticsSnapshot).isEqualTo(expectedStatistics);
     }
 }
