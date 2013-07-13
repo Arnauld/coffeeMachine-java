@@ -1,13 +1,22 @@
 package coffeemachine;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import cucumber.api.DataTable;
 import cucumber.api.Format;
+import cucumber.api.Scenario;
+import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -20,10 +29,28 @@ import java.util.Map;
  */
 public class CoffeeMachineStepdefs {
 
-    private CoffeMakerGateway gateway = new CoffeMakerGateway();
+    private BeverageQuantityChecker beverageQuantityChecker;
+    private EmailNotifier emailNotifier;
+    //
+    private CoffeMakerGateway gateway;
     private String message;
     private BigDecimal money = new BigDecimal("2");
     private String statisticsSnapshot;
+    private Scenario scenario;
+
+    @Before
+    public void intializeContext(Scenario scenario) {
+        this.beverageQuantityChecker = Mockito.mock(BeverageQuantityChecker.class);
+        this.emailNotifier = Mockito.mock(EmailNotifier.class);
+
+        //
+        this.scenario = scenario;
+        this.gateway = new CoffeMakerGateway(emailNotifier, beverageQuantityChecker);
+        this.money = new BigDecimal("2");
+
+        // not required, but make it explicit
+        when(beverageQuantityChecker.isEmpty(anyString())).thenReturn(false);
+    }
 
     @When("^I order an? \"([^\"]*)\"$")
     public void I_order_an(String typeOfDrink) throws Throwable {
@@ -88,5 +115,18 @@ public class CoffeeMachineStepdefs {
     @Then("^the report output should be$")
     public void the_report_ouput_should_be(String expectedStatistics) throws Throwable {
         assertThat(statisticsSnapshot).isEqualTo(expectedStatistics);
+    }
+
+    @Given("^no more \"([^\"]*)\" remaining in the machine$")
+    public void no_more_in_the_machine(String typeOfDrink) throws Throwable {
+        reset(beverageQuantityChecker);
+        when(beverageQuantityChecker.isEmpty(eq(typeOfDrink.toLowerCase()))).thenReturn(true);
+    }
+
+    @Then("^a mail should have been sent indicating \"([^\"]*)\" is running out$")
+    public void a_mail_should_have_been_sent_indicating_is_running_out(String typeOfDrink) throws Throwable {
+        ArgumentCaptor<String> drinkCapture = ArgumentCaptor.forClass(String.class);
+        verify(emailNotifier).notifyMissingDrink(drinkCapture.capture());
+        assertThat(drinkCapture.getValue()).isEqualToIgnoringCase(typeOfDrink);
     }
 }
