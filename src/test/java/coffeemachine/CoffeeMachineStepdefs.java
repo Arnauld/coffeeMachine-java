@@ -3,16 +3,13 @@ package coffeemachine;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import cucumber.api.DataTable;
-import cucumber.api.Format;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 /**
