@@ -24,3 +24,9 @@ Feature: Running Out
     | Orange juice |
     | Tea          |
     | Chocolate    |
+
+  @manual
+  Scenario: Manually send an email
+    Given an empty machine
+    When I click on the "Send Test Email" button
+    Then a test mail should have been sent
